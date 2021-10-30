@@ -11,8 +11,9 @@ api = Api(app)
 def get_status():
     try:
         website = request.args.get('url')
+        timeout = 10 #switch to 0.000001 to test timeout
 
-        res = requests.get("https://www." + website, timeout=10) #switch from 10 to 0.000001 to test timeout
+        res = requests.get("https://www." + website, timeout=timeout) 
 
         ip = socket.gethostbyname(website)
         respose_time = res.elapsed.total_seconds()
@@ -46,8 +47,9 @@ def get_status():
         
         return ret
     except Timeout:
-        ######################## To fix: custom message not working
-        abort(408, description="Request timeout! Could not establish connection within 10 seconds.")
+        #description deprecated in flask 2.x.x?
+        #abort(408, description="Request timeout! Could not establish connection within 10 seconds.") 
+        return {"message": "Request timeout! Could not establish connection within " + str(timeout) + " seconds."}, 408
     except:
         return {"message": "Connection error!"}
 
@@ -68,4 +70,4 @@ def get_me():
 
     return ret
 
-app.run(debug=False)
+app.run(debug=True)
